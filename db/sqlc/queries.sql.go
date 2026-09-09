@@ -71,12 +71,12 @@ func (q *Queries) CreateServicio(ctx context.Context, arg CreateServicioParams) 
 
 const createSubscripcion = `-- name: CreateSubscripcion :one
 
-INSERT INTO subscripciones (
-    id_usuario, id_servicio, monto, fecha_vencimiento, fecha_inicio, usuario_cuenta, contraseña_cuenta, estado
+INSERT INTO suscripciones (
+    id_usuario, id_servicio, monto, fecha_vencimiento, fecha_inicio, usuario_cuenta, password_cuenta, estado
 ) VALUES (
     $1, $2, $3, $4, $5, $6, $7, $8
 )
-RETURNING id_suscripciones, id_usuario, id_servicio, monto, fecha_vencimiento, fecha_inicio, usuario_cuenta, "contraseña_cuenta", estado, created_at
+RETURNING id_suscripciones, id_usuario, id_servicio, monto, fecha_vencimiento, fecha_inicio, usuario_cuenta, password_cuenta, estado, created_at
 `
 
 type CreateSubscripcionParams struct {
@@ -86,12 +86,12 @@ type CreateSubscripcionParams struct {
 	FechaVencimiento time.Time      `json:"fecha_vencimiento"`
 	FechaInicio      time.Time      `json:"fecha_inicio"`
 	UsuarioCuenta    string         `json:"usuario_cuenta"`
-	ContraseñaCuenta string         `json:"contraseña_cuenta"`
+	PasswordCuenta   string         `json:"password_cuenta"`
 	Estado           sql.NullString `json:"estado"`
 }
 
 // consulta para suscripciones
-func (q *Queries) CreateSubscripcion(ctx context.Context, arg CreateSubscripcionParams) (Subscripcione, error) {
+func (q *Queries) CreateSubscripcion(ctx context.Context, arg CreateSubscripcionParams) (Suscripcione, error) {
 	row := q.db.QueryRowContext(ctx, createSubscripcion,
 		arg.IDUsuario,
 		arg.IDServicio,
@@ -99,10 +99,10 @@ func (q *Queries) CreateSubscripcion(ctx context.Context, arg CreateSubscripcion
 		arg.FechaVencimiento,
 		arg.FechaInicio,
 		arg.UsuarioCuenta,
-		arg.ContraseñaCuenta,
+		arg.PasswordCuenta,
 		arg.Estado,
 	)
-	var i Subscripcione
+	var i Suscripcione
 	err := row.Scan(
 		&i.IDSuscripciones,
 		&i.IDUsuario,
@@ -111,7 +111,7 @@ func (q *Queries) CreateSubscripcion(ctx context.Context, arg CreateSubscripcion
 		&i.FechaVencimiento,
 		&i.FechaInicio,
 		&i.UsuarioCuenta,
-		&i.ContraseñaCuenta,
+		&i.PasswordCuenta,
 		&i.Estado,
 		&i.CreatedAt,
 	)
@@ -121,19 +121,19 @@ func (q *Queries) CreateSubscripcion(ctx context.Context, arg CreateSubscripcion
 const createUsuario = `-- name: CreateUsuario :one
 
 INSERT INTO usuario (
-    nombre, apellido, dni, email, contraseña
+    nombre, apellido, dni, email, password
 ) VALUES (
     $1, $2, $3, $4, $5
 )
-RETURNING id_usuario, nombre, apellido, dni, email, "contraseña", created_at
+RETURNING id_usuario, nombre, apellido, dni, email, password, created_at
 `
 
 type CreateUsuarioParams struct {
-	Nombre     string `json:"nombre"`
-	Apellido   string `json:"apellido"`
-	Dni        string `json:"dni"`
-	Email      string `json:"email"`
-	Contraseña string `json:"contraseña"`
+	Nombre   string `json:"nombre"`
+	Apellido string `json:"apellido"`
+	Dni      string `json:"dni"`
+	Email    string `json:"email"`
+	Password string `json:"password"`
 }
 
 // consultas para el usuario
@@ -143,7 +143,7 @@ func (q *Queries) CreateUsuario(ctx context.Context, arg CreateUsuarioParams) (U
 		arg.Apellido,
 		arg.Dni,
 		arg.Email,
-		arg.Contraseña,
+		arg.Password,
 	)
 	var i Usuario
 	err := row.Scan(
@@ -152,7 +152,7 @@ func (q *Queries) CreateUsuario(ctx context.Context, arg CreateUsuarioParams) (U
 		&i.Apellido,
 		&i.Dni,
 		&i.Email,
-		&i.Contraseña,
+		&i.Password,
 		&i.CreatedAt,
 	)
 	return i, err
@@ -179,7 +179,7 @@ func (q *Queries) DeleteServicio(ctx context.Context, idServicio int32) error {
 }
 
 const deleteSubscripcion = `-- name: DeleteSubscripcion :exec
-DELETE FROM subscripciones 
+DELETE FROM suscripciones 
 WHERE id_suscripciones = $1
 `
 
@@ -234,13 +234,13 @@ func (q *Queries) GetServicio(ctx context.Context, idServicio int32) (Servicio, 
 }
 
 const getSubscripcion = `-- name: GetSubscripcion :one
-SELECT id_suscripciones, id_usuario, id_servicio, monto, fecha_vencimiento, fecha_inicio, usuario_cuenta, "contraseña_cuenta", estado, created_at FROM subscripciones 
+SELECT id_suscripciones, id_usuario, id_servicio, monto, fecha_vencimiento, fecha_inicio, usuario_cuenta, password_cuenta, estado, created_at FROM suscripciones 
 WHERE id_suscripciones = $1
 `
 
-func (q *Queries) GetSubscripcion(ctx context.Context, idSuscripciones int32) (Subscripcione, error) {
+func (q *Queries) GetSubscripcion(ctx context.Context, idSuscripciones int32) (Suscripcione, error) {
 	row := q.db.QueryRowContext(ctx, getSubscripcion, idSuscripciones)
-	var i Subscripcione
+	var i Suscripcione
 	err := row.Scan(
 		&i.IDSuscripciones,
 		&i.IDUsuario,
@@ -249,7 +249,7 @@ func (q *Queries) GetSubscripcion(ctx context.Context, idSuscripciones int32) (S
 		&i.FechaVencimiento,
 		&i.FechaInicio,
 		&i.UsuarioCuenta,
-		&i.ContraseñaCuenta,
+		&i.PasswordCuenta,
 		&i.Estado,
 		&i.CreatedAt,
 	)
@@ -257,7 +257,7 @@ func (q *Queries) GetSubscripcion(ctx context.Context, idSuscripciones int32) (S
 }
 
 const getUsuario = `-- name: GetUsuario :one
-SELECT id_usuario, nombre, apellido, dni, email, "contraseña", created_at FROM usuario 
+SELECT id_usuario, nombre, apellido, dni, email, password, created_at FROM usuario 
 WHERE id_usuario = $1
 `
 
@@ -270,7 +270,7 @@ func (q *Queries) GetUsuario(ctx context.Context, idUsuario int32) (Usuario, err
 		&i.Apellido,
 		&i.Dni,
 		&i.Email,
-		&i.Contraseña,
+		&i.Password,
 		&i.CreatedAt,
 	)
 	return i, err
@@ -354,7 +354,7 @@ SELECT
     sub.estado,
     ser.nombre AS servicio_nombre,
     ser.categoria AS servicio_categoria
-FROM subscripciones sub
+FROM suscripciones sub
 JOIN servicio ser ON sub.id_servicio = ser.id_servicio
 WHERE sub.id_usuario = $1
 ORDER BY ser.nombre ASC
@@ -404,7 +404,7 @@ func (q *Queries) ListSubscripcionesUsuario(ctx context.Context, idUsuario int32
 }
 
 const listUsuarios = `-- name: ListUsuarios :many
-SELECT id_usuario, nombre, apellido, dni, email, "contraseña", created_at FROM usuario 
+SELECT id_usuario, nombre, apellido, dni, email, password, created_at FROM usuario 
 ORDER BY apellido, nombre
 `
 
@@ -423,7 +423,7 @@ func (q *Queries) ListUsuarios(ctx context.Context) ([]Usuario, error) {
 			&i.Apellido,
 			&i.Dni,
 			&i.Email,
-			&i.Contraseña,
+			&i.Password,
 			&i.CreatedAt,
 		); err != nil {
 			return nil, err
@@ -458,12 +458,12 @@ func (q *Queries) UpdateServicio(ctx context.Context, arg UpdateServicioParams) 
 }
 
 const updateSubscripcion = `-- name: UpdateSubscripcion :exec
-UPDATE subscripciones 
+UPDATE suscripciones 
 SET monto = $2, 
     fecha_vencimiento = $3, 
     estado = $4, 
     usuario_cuenta = $5, 
-    contraseña_cuenta = $6
+    password_cuenta = $6
 WHERE id_suscripciones = $1
 `
 
@@ -473,7 +473,7 @@ type UpdateSubscripcionParams struct {
 	FechaVencimiento time.Time      `json:"fecha_vencimiento"`
 	Estado           sql.NullString `json:"estado"`
 	UsuarioCuenta    string         `json:"usuario_cuenta"`
-	ContraseñaCuenta string         `json:"contraseña_cuenta"`
+	PasswordCuenta   string         `json:"password_cuenta"`
 }
 
 func (q *Queries) UpdateSubscripcion(ctx context.Context, arg UpdateSubscripcionParams) error {
@@ -483,7 +483,7 @@ func (q *Queries) UpdateSubscripcion(ctx context.Context, arg UpdateSubscripcion
 		arg.FechaVencimiento,
 		arg.Estado,
 		arg.UsuarioCuenta,
-		arg.ContraseñaCuenta,
+		arg.PasswordCuenta,
 	)
 	return err
 }
@@ -494,17 +494,17 @@ SET nombre = $2,
     apellido = $3, 
     dni = $4, 
     email = $5, 
-    contraseña = $6
+    password = $6
 WHERE id_usuario = $1
 `
 
 type UpdateUsuarioParams struct {
-	IDUsuario  int32  `json:"id_usuario"`
-	Nombre     string `json:"nombre"`
-	Apellido   string `json:"apellido"`
-	Dni        string `json:"dni"`
-	Email      string `json:"email"`
-	Contraseña string `json:"contraseña"`
+	IDUsuario int32  `json:"id_usuario"`
+	Nombre    string `json:"nombre"`
+	Apellido  string `json:"apellido"`
+	Dni       string `json:"dni"`
+	Email     string `json:"email"`
+	Password  string `json:"password"`
 }
 
 func (q *Queries) UpdateUsuario(ctx context.Context, arg UpdateUsuarioParams) error {
@@ -514,7 +514,7 @@ func (q *Queries) UpdateUsuario(ctx context.Context, arg UpdateUsuarioParams) er
 		arg.Apellido,
 		arg.Dni,
 		arg.Email,
-		arg.Contraseña,
+		arg.Password,
 	)
 	return err
 }

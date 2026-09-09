@@ -24,7 +24,7 @@ type Servicio struct {
 	CreatedAt  sql.NullTime `json:"created_at"`
 }
 
-type Subscripcione struct {
+type Suscripcione struct {
 	IDSuscripciones  int32          `json:"id_suscripciones"`
 	IDUsuario        int32          `json:"id_usuario"`
 	IDServicio       int32          `json:"id_servicio"`
@@ -32,17 +32,17 @@ type Subscripcione struct {
 	FechaVencimiento time.Time      `json:"fecha_vencimiento"`
 	FechaInicio      time.Time      `json:"fecha_inicio"`
 	UsuarioCuenta    string         `json:"usuario_cuenta"`
-	ContraseñaCuenta string         `json:"contraseña_cuenta"`
+	PasswordCuenta   string         `json:"password_cuenta"`
 	Estado           sql.NullString `json:"estado"`
 	CreatedAt        sql.NullTime   `json:"created_at"`
 }
 
 type Usuario struct {
-	IDUsuario  int32        `json:"id_usuario"`
-	Nombre     string       `json:"nombre"`
-	Apellido   string       `json:"apellido"`
-	Dni        string       `json:"dni"`
-	Email      string       `json:"email"`
-	Contraseña string       `json:"contraseña"`
-	CreatedAt  sql.NullTime `json:"created_at"`
+	IDUsuario int32        `json:"id_usuario"`
+	Nombre    string       `json:"nombre"`
+	Apellido  string       `json:"apellido"`
+	Dni       string       `json:"dni"`
+	Email     string       `json:"email"`
+	Password  string       `json:"password"`
+	CreatedAt sql.NullTime `json:"created_at"`
 }

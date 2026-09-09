@@ -5,11 +5,11 @@ CREATE TABLE usuario (
     apellido VARCHAR(255) NOT NULL,
     dni VARCHAR(20) UNIQUE NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
-    contraseña VARCHAR(255) NOT NULL,
+    password VARCHAR(255) NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 --tabla de suscipciones 
-CREATE TABLE subscripciones (
+CREATE TABLE suscripciones (
     id_suscripciones SERIAL PRIMARY KEY,
     id_usuario INT NOT NULL,
     id_servicio INT NOT NULL,
@@ -17,7 +17,7 @@ CREATE TABLE subscripciones (
     fecha_vencimiento DATE NOT NULL,
     fecha_inicio DATE NOT NULL,
     usuario_cuenta  VARCHAR(255) NOT NULL,
-    contraseña_cuenta VARCHAR(255) NOT NULL,
+    password_cuenta VARCHAR(255) NOT NULL,
     estado VARCHAR(20) DEFAULT 'Activa',
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
@@ -40,15 +40,15 @@ CREATE TABLE pago (
 
 -- las alteraciones con las pk y fk 
 
-ALTER TABLE subscripciones
+ALTER TABLE suscripciones
     ADD CONSTRAINT fk_sub_usuario
     FOREIGN KEY (id_usuario) REFERENCES usuario(id_usuario) ON DELETE CASCADE;
 
-ALTER TABLE subscripciones
+ALTER TABLE suscripciones
     ADD CONSTRAINT fk_sub_servicio
     FOREIGN KEY (id_servicio) REFERENCES servicio(id_servicio);
 
 
 ALTER TABLE pago
     ADD CONSTRAINT fk_pago_sub 
-    FOREIGN KEY (id_suscripciones) REFERENCES subscripciones(id_suscripciones) ON DELETE CASCADE;
+    FOREIGN KEY (id_suscripciones) REFERENCES suscripciones(id_suscripciones) ON DELETE CASCADE;

@@ -3,7 +3,7 @@
 
 -- name: CreateUsuario :one
 INSERT INTO usuario (
-    nombre, apellido, dni, email, contraseña
+    nombre, apellido, dni, email, password
 ) VALUES (
     $1, $2, $3, $4, $5
 )
@@ -23,7 +23,7 @@ SET nombre = $2,
     apellido = $3, 
     dni = $4, 
     email = $5, 
-    contraseña = $6
+    password = $6
 WHERE id_usuario = $1;
 
 -- name: DeleteUsuario :exec
@@ -61,15 +61,15 @@ WHERE id_servicio = $1;
 -- consulta para suscripciones 
 
 -- name: CreateSubscripcion :one
-INSERT INTO subscripciones (
-    id_usuario, id_servicio, monto, fecha_vencimiento, fecha_inicio, usuario_cuenta, contraseña_cuenta, estado
+INSERT INTO suscripciones (
+    id_usuario, id_servicio, monto, fecha_vencimiento, fecha_inicio, usuario_cuenta, password_cuenta, estado
 ) VALUES (
     $1, $2, $3, $4, $5, $6, $7, $8
 )
 RETURNING *;
 
 -- name: GetSubscripcion :one
-SELECT * FROM subscripciones 
+SELECT * FROM suscripciones 
 WHERE id_suscripciones = $1;
 
 -- name: ListSubscripcionesUsuario :many
@@ -82,22 +82,22 @@ SELECT
     sub.estado,
     ser.nombre AS servicio_nombre,
     ser.categoria AS servicio_categoria
-FROM subscripciones sub
+FROM suscripciones sub
 JOIN servicio ser ON sub.id_servicio = ser.id_servicio
 WHERE sub.id_usuario = $1
 ORDER BY ser.nombre ASC;
 
 -- name: UpdateSubscripcion :exec
-UPDATE subscripciones 
+UPDATE suscripciones 
 SET monto = $2, 
     fecha_vencimiento = $3, 
     estado = $4, 
     usuario_cuenta = $5, 
-    contraseña_cuenta = $6
+    password_cuenta = $6
 WHERE id_suscripciones = $1;
 
 -- name: DeleteSubscripcion :exec
-DELETE FROM subscripciones 
+DELETE FROM suscripciones 
 WHERE id_suscripciones = $1;
 
 
