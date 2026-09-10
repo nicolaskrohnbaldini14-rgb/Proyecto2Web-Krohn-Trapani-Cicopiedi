@@ -7,11 +7,11 @@ import (
 	"time"
 
 	_ "github.com/jackc/pgx/v5/stdlib"
-	sqlc "tp2-krohn-trapani-cicopiedi/db/sqlc" // Alias unificado: sqlc
+	sqlc "tp2-krohn-trapani-cicopiedi/db/sqlc"
 )
 
 func TestTablasDominio_CRUD(t *testing.T) {
-	// 1. Conexión a la base de datos PostgreSQL en Docker
+	// 1. Conexión a PostgreSQL en Docker
 	connStr := "postgres://postgres:postgres@localhost:5432/mi_tp2_db?sslmode=disable"
 	dbConn, err := sql.Open("pgx", connStr)
 	if err != nil {
@@ -27,13 +27,13 @@ func TestTablasDominio_CRUD(t *testing.T) {
 	queries := sqlc.New(dbConn)
 	ctx := context.Background()
 
-	// 2. Limpieza previa de tablas respetando claves foráneas
-	_, err = dbConn.Exec("TRUNCATE TABLE pago, subscripciones, servicio, usuario CASCADE")
+	// 2. Limpieza de las 4 tablas en orden inverso por claves foráneas
+	_, err = dbConn.Exec("TRUNCATE TABLE pago, suscripciones, servicio, usuario CASCADE")
 	if err != nil {
 		t.Fatalf("Error al limpiar las tablas de la BD: %v", err)
 	}
 
-	// Variables para encadenar las claves foráneas entre pruebas
+	// Variables para encadenar los IDs generados entre tablas
 	var createdUserID int32
 	var createdServiceID int32
 	var createdSubID int32
@@ -113,7 +113,7 @@ func TestTablasDominio_CRUD(t *testing.T) {
 
 			_, err = queries.GetUsuario(ctx, usrTemp.IDUsuario)
 			if err != sql.ErrNoRows {
-				t.Errorf("Se esperaba sql.ErrNoRows al buscar usuario eliminado, obtenido: %v", err)
+				t.Errorf("Se esperaba sql.ErrNoRows al buscar un usuario eliminado, pero se obtuvo: %v", err)
 			}
 		})
 	})
@@ -256,8 +256,10 @@ func TestTablasDominio_CRUD(t *testing.T) {
 			}
 		})
 
-		t.Run("ListPagosSuscripcion", func(t *testing.T) {
-			pagos, err := queries.ListPagosSuscripcion(ctx, createdSubID)
+		t.Run("ListPagos", func(t *testing.T) {
+			// Si en db/sqlc/queries.sql.go el método se llama ListPagosBySuscripcion,
+			// reemplaza queries.ListPagos(ctx) por queries.ListPagosBySuscripcion(ctx, createdSubID)
+			pagos, err := queries.ListPagos(ctx, createdSubID)
 			if err != nil {
 				t.Fatalf("Error al listar pagos: %v", err)
 			}
@@ -272,7 +274,7 @@ func TestTablasDominio_CRUD(t *testing.T) {
 				t.Fatalf("Error al eliminar pago: %v", err)
 			}
 
-			// Limpieza final de registros asociados
+			// Limpieza final de entidades asociadas
 			_ = queries.DeleteSubscripcion(ctx, createdSubID)
 			_ = queries.DeleteServicio(ctx, createdServiceID)
 			_ = queries.DeleteUsuario(ctx, createdUserID)

@@ -115,7 +115,7 @@ RETURNING *;
 SELECT * FROM pago 
 WHERE id_pago = $1;
 
--- name: ListPagosPorSubscripcion :many
+-- name: ListPagos :many
 SELECT * FROM pago 
 WHERE id_suscripciones = $1 
 ORDER BY fecha_pago DESC;

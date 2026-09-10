@@ -276,14 +276,14 @@ func (q *Queries) GetUsuario(ctx context.Context, idUsuario int32) (Usuario, err
 	return i, err
 }
 
-const listPagosPorSubscripcion = `-- name: ListPagosPorSubscripcion :many
+const listPagos = `-- name: ListPagos :many
 SELECT id_pago, id_suscripciones, monto, fecha_pago, created_at FROM pago 
 WHERE id_suscripciones = $1 
 ORDER BY fecha_pago DESC
 `
 
-func (q *Queries) ListPagosPorSubscripcion(ctx context.Context, idSuscripciones int32) ([]Pago, error) {
-	rows, err := q.db.QueryContext(ctx, listPagosPorSubscripcion, idSuscripciones)
+func (q *Queries) ListPagos(ctx context.Context, idSuscripciones int32) ([]Pago, error) {
+	rows, err := q.db.QueryContext(ctx, listPagos, idSuscripciones)
 	if err != nil {
 		return nil, err
 	}
