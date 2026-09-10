@@ -124,5 +124,5 @@ ORDER BY fecha_pago DESC;
 DELETE FROM pago 
 WHERE id_pago = $1;
 
--- el update de un pago no existe ya que seria un historial}
+-- el update de un pago no existe ya que seria un historial
 
